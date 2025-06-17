@@ -25,12 +25,11 @@ public final class ProducerThread<E> extends AbstractSimulationThread<E> {
             final E element        = elementProvider.produce();
             final E haltingElement = elementProvider.getHaltingElement();
             
+            queue.push(element, this);
+            
             if (Objects.equals(element, haltingElement)) {
-//                queue.push(null, this);
                 return;
             }
-            
-            queue.push(element, this);
         }
     }
 }

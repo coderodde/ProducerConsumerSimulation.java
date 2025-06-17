@@ -21,7 +21,7 @@ public final class ConsumerThread<E> extends AbstractSimulationThread<E> {
             E element = queue.pop(this);
             
             if (Objects.equals(element, haltingElement)) {
-                queue.push(haltingElement, null);
+//                queue.push(haltingElement, null);
                 return;
             }
         }
