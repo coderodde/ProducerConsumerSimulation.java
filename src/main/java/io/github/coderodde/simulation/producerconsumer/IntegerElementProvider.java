@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version 1.0.0
  * @since 1.0.0
  */
-public final class IntegerElementProducer implements ElementProducer<Integer> {
+public final class IntegerElementProvider implements ElementProvider<Integer> {
 
     /**
      * The halting element signalling the end of element production.
@@ -19,7 +19,7 @@ public final class IntegerElementProducer implements ElementProducer<Integer> {
      */
     private final AtomicInteger atomicInteger = new AtomicInteger(0);
     
-    public IntegerElementProducer(final Integer haltingElement) {
+    public IntegerElementProvider(final Integer haltingElement) {
         this.haltingInteger = 
                 Objects.requireNonNull(
                         haltingElement,
@@ -33,8 +33,10 @@ public final class IntegerElementProducer implements ElementProducer<Integer> {
     
     @Override
     public Integer produce() {
-        final int currentValue = atomicInteger.getAndIncrement();
+        if (atomicInteger.get() >= haltingInteger) {
+            return haltingInteger;
+        }
         
-        return currentValue == haltingInteger ? haltingInteger : currentValue;
+        return atomicInteger.getAndIncrement();
     }
 }

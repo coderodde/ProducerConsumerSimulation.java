@@ -1,7 +1,6 @@
 package io.github.coderodde.simulation.producerconsumer;
 
 import java.util.Objects;
-import java.util.Random;
 
 /**
  *
@@ -19,9 +18,10 @@ public final class ConsumerThread<E> extends AbstractSimulationThread<E> {
     @Override
     public void run() {
         while (true) {
-            final E element = queue.pop();
-
+            E element = queue.pop(this);
+            
             if (Objects.equals(element, haltingElement)) {
+                queue.push(haltingElement, null);
                 return;
             }
         }

@@ -43,6 +43,11 @@ public final class BoundedConcurrentQueue<E> {
      */
     private int size = 0;
     
+    /**
+     * Possible queue notifier object.
+     */
+    private AbstractQueueNotifier<E> queueNotifier;
+    
     public BoundedConcurrentQueue(final int capacity) {
         checkCapacity(capacity);
         semaphoreFreeSpots = new Semaphore(0,        true);
@@ -51,35 +56,40 @@ public final class BoundedConcurrentQueue<E> {
         array              = (E[]) new Object[capacity];
     }
     
-    public void push(final E element) {
+    public void push(final E element, final ProducerThread<E> thread) {
         semaphoreFreeSpots.release();
         semaphoreFillSpots.acquireUninterruptibly();
         mutex.acquireUninterruptibly();
         array[logicalIndexToPhysicalIndex(size++)] = element;
         
-        System.out.printf(
-                "Producer %d pushed %s: %s\n",
-                          ((ProducerThread<E>) Thread.currentThread())
-                                                     .getThreadId(),
-                          Objects.toString(element), 
-                          this.toString());
+        if (queueNotifier != null) {
+            queueNotifier.onPush(thread, 
+                                 element);
+        }
+        
         mutex.release();
     }
     
-    public E pop() {
+    public E pop(final ConsumerThread<E> thread) {
         semaphoreFillSpots.release();
         semaphoreFreeSpots.acquireUninterruptibly();
         mutex.acquireUninterruptibly();
-        final E element = array[headIndex++];
+        final E element = array[headIndex];
+        headIndex = (headIndex + 1) % array.length;
         --size;
-                
-        System.out.printf(
-                "Consumer %d popped %s: %s\n",
-                          ((ConsumerThread<E>) Thread.currentThread())
-                                                     .getThreadId(),
-                          Objects.toString(element), 
-                          this.toString());
-
+        
+        if (queueNotifier != null) {
+            queueNotifier.onPop(thread,
+                                element);
+        }
+        
+        mutex.release();
+        return element;
+    }
+    
+    public E top() {
+        mutex.acquireUninterruptibly();
+        final E element = array[headIndex];
         mutex.release();
         return element;
     }
@@ -100,6 +110,10 @@ public final class BoundedConcurrentQueue<E> {
         }
         
         return sb.append("]").toString();
+    }
+    
+    public void setQueueNotifier(final AbstractQueueNotifier<E> queueNotifier) {
+        this.queueNotifier = queueNotifier;
     }
     
     private int logicalIndexToPhysicalIndex(final int index) {

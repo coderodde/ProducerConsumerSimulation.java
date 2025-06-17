@@ -1,7 +1,6 @@
 package io.github.coderodde.simulation.producerconsumer;
 
 import java.util.Objects;
-import java.util.Random;
 
 /**
  * This class implements producer threads.
@@ -11,26 +10,27 @@ import java.util.Random;
  */
 public final class ProducerThread<E> extends AbstractSimulationThread<E> {
     
-    private final ElementProducer<E> elementProducer;
+    private final ElementProvider<E> elementProvider;
     
-    public ProducerThread(final ElementProducer<E> elementProducer,
+    public ProducerThread(final ElementProvider<E> elementProducer,
                           final BoundedConcurrentQueue<E> queue) {
         
         super(elementProducer.getHaltingElement(), queue);
-        this.elementProducer = elementProducer;
+        this.elementProvider = elementProducer;
     }
     
     @Override
     public void run() {
         while (true) {
-            final E element = elementProducer.produce();
-
-            if (Objects.equals(element, 
-                               elementProducer.getHaltingElement())) {
+            final E element        = elementProvider.produce();
+            final E haltingElement = elementProvider.getHaltingElement();
+            
+            if (Objects.equals(element, haltingElement)) {
+//                queue.push(null, this);
                 return;
             }
-
-            queue.push(element);
+            
+            queue.push(element, this);
         }
     }
 }

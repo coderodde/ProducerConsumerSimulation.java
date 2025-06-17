@@ -2,41 +2,45 @@ package io.github.coderodde.simulation.producerconsumer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
- * @author rodio
  */
 public final class Simulator {
     
     private final int numberOfProducerThreads;
     private final int numberOfConsumerThreads;
-    private final int queueCapacity;
-    private final IntegerElementProducer elementProducer;
+    private BoundedConcurrentQueue<Integer> queue;
+    private IntegerElementProvider elementProducer;
+    private IntegerQueueNotifier queueNotifier;
     
     public Simulator(final int numberOfProducerThreads,
-                     final int numberOfConsumerThreads,
-                     final int queueCapacity,
-                     final IntegerElementProducer elementProducer) {
+                     final int numberOfConsumerThreads) {
         
         this.numberOfProducerThreads = 
                 checkNumberOfProducerThreads(numberOfProducerThreads);
         
         this.numberOfConsumerThreads =
                 checkNumberOfConsumerThreads(numberOfConsumerThreads);
+    }
+    
+    public void setQueue(final BoundedConcurrentQueue<Integer> queue) {
+        this.queue = queue;
+    }
+    
+    public void setElementProvider(
+            final IntegerElementProvider elementProducer) {
         
-        this.queueCapacity = checkQueueCapacity(queueCapacity);
-        
-        this.elementProducer = 
-                Objects.requireNonNull(
-                        elementProducer, 
-                        "The input elementProducer is null");
+        this.elementProducer = elementProducer;
+    }
+    
+    public void setQueueNotifier(final IntegerQueueNotifier queueNotifier) {
+        this.queueNotifier = queueNotifier;
     }
     
     public void run() {
-        final BoundedConcurrentQueue<Integer> queue =
-          new BoundedConcurrentQueue<>(queueCapacity);
+        
+        queue.setQueueNotifier(queueNotifier);
         
         final List<ConsumerThread<Integer>> consumerThreadList;
         final List<ProducerThread<Integer>> producerThreadList;
