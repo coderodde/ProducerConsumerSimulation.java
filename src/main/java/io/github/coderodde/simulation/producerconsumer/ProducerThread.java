@@ -13,23 +13,38 @@ public final class ProducerThread<E> extends AbstractSimulationThread<E> {
     private final ElementProvider<E> elementProvider;
     
     public ProducerThread(final ElementProvider<E> elementProducer,
-                          final BoundedConcurrentQueue<E> queue) {
+                          final BoundedConcurrentQueue<E> queue,
+                          final SharedProducerThreadState sharedState) {
         
-        super(elementProducer.getHaltingElement(), queue);
+        super(elementProducer.getHaltingElement(),
+              queue, 
+              sharedState);
+        
         this.elementProvider = elementProducer;
     }
     
     @Override
     public void run() {
         while (true) {
+            
+            if (sharedState.isHaltRequested()) {
+                return;
+            }
+            
             final E element        = elementProvider.produce();
             final E haltingElement = elementProvider.getHaltingElement();
             
             queue.push(element, this);
             
             if (Objects.equals(element, haltingElement)) {
+                sharedState.requestHalt();
                 return;
             }
         }
+    }
+    
+    @Override
+    public String toString() {
+        return "Producer thread";
     }
 }

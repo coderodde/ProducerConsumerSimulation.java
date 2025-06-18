@@ -32,8 +32,12 @@ public abstract class AbstractSimulationThread<E> extends Thread {
      */
     private static int threadIdCounter = 0;
     
-    public AbstractSimulationThread(final E haltingElement,
-                                    final BoundedConcurrentQueue<E> queue) {
+    protected final SharedProducerThreadState sharedState;
+    
+    public AbstractSimulationThread(
+            final E haltingElement,
+            final BoundedConcurrentQueue<E> queue,
+            final SharedProducerThreadState sharedState) {
         
         this.threadId = threadIdCounter++;
         
@@ -43,6 +47,10 @@ public abstract class AbstractSimulationThread<E> extends Thread {
                         "The input haltingElement is null");
         
         this.queue = Objects.requireNonNull(queue, "The input queue is null");
+        this.sharedState = 
+                Objects.requireNonNull(
+                        sharedState, 
+                        "The input sharedState is null");
     }
     
     public int getThreadId() {

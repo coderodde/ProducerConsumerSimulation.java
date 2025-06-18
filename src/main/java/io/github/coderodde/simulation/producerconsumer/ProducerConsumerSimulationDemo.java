@@ -8,8 +8,8 @@ package io.github.coderodde.simulation.producerconsumer;
  */
 public final class ProducerConsumerSimulationDemo {
 
-    private static final int DEFAULT_NUMBER_OF_PRODUCERS = 20;
-    private static final int DEFAULT_NUMBER_OF_CONSUMERS = 15;
+    private static final int DEFAULT_NUMBER_OF_PRODUCERS = 15;
+    private static final int DEFAULT_NUMBER_OF_CONSUMERS = 20;
     private static final int DEFAULT_HALTING_INTEGER = 300;
     private static final int DEFAULT_QUEUE_CAPACITY = 10;
     

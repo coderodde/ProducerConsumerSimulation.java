@@ -1,6 +1,5 @@
 package io.github.coderodde.simulation.producerconsumer;
 
-import java.util.Objects;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -56,7 +55,9 @@ public final class BoundedConcurrentQueue<E> {
         array              = (E[]) new Object[capacity];
     }
     
-    public void push(final E element, final ProducerThread<E> thread) {
+    public void push(final E element,
+                     final AbstractSimulationThread<E> thread) {
+        
         semaphoreFreeSpots.release();
         semaphoreFillSpots.acquireUninterruptibly();
         mutex.acquireUninterruptibly();
@@ -92,6 +93,13 @@ public final class BoundedConcurrentQueue<E> {
         final E element = array[headIndex];
         mutex.release();
         return element;
+    }
+    
+    public int size() {
+        mutex.acquireUninterruptibly();
+        final int sz = size;
+        mutex.release();
+        return sz;
     }
     
     @Override

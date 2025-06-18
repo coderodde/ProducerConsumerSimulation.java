@@ -10,20 +10,35 @@ import java.util.Objects;
 public final class ConsumerThread<E> extends AbstractSimulationThread<E> {
     
     public ConsumerThread(final E haltingElement,
-                          final BoundedConcurrentQueue<E> queue) {
+                          final BoundedConcurrentQueue<E> queue,
+                          final SharedProducerThreadState sharedState) {
         
-        super(haltingElement, queue);
+        super(haltingElement,
+              queue, 
+              sharedState);
     }
     
     @Override
     public void run() {
         while (true) {
-            E element = queue.pop(this);
-            
-            if (Objects.equals(element, haltingElement)) {
-//                queue.push(haltingElement, null);
+            if (sharedState.isHaltRequested() && queue.size() == 0) {
+                System.out.println("hello");
                 return;
             }
+            
+            E element = queue.pop(this);
+            
+//            if (Objects.equals(element, haltingElement)) {
+//                System.out.println("return");
+//                queue.pop(this);
+//                queue.push(haltingElement, this);
+//                return;
+//            }
         }
+    }
+    
+    @Override
+    public String toString() {
+        return "Consumer thread";
     }
 }

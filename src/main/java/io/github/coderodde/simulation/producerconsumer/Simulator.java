@@ -45,13 +45,17 @@ public final class Simulator {
         final List<ConsumerThread<Integer>> consumerThreadList;
         final List<ProducerThread<Integer>> producerThreadList;
         
+        final SharedProducerThreadState sharedState =
+          new SharedProducerThreadState();
+        
         consumerThreadList = new ArrayList<>(numberOfConsumerThreads);
         producerThreadList = new ArrayList<>(numberOfProducerThreads);
         
         for (int i = 0; i < numberOfConsumerThreads; ++i) {
             final ConsumerThread<Integer> thread = 
                     new ConsumerThread(elementProducer.getHaltingElement(), 
-                                       queue);
+                                       queue,
+                                       sharedState);
             
             consumerThreadList.add(thread);
             thread.start();
@@ -60,7 +64,8 @@ public final class Simulator {
         for (int i = 0; i < numberOfProducerThreads; ++i) {
             final ProducerThread<Integer> thread = 
                     new ProducerThread(elementProducer, 
-                                       queue);
+                                       queue,
+                                       sharedState);
             
             producerThreadList.add(thread);
             thread.start();

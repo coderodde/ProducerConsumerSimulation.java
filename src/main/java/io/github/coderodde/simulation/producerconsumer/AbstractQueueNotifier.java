@@ -14,7 +14,7 @@ public abstract class AbstractQueueNotifier<E> {
         this.queue = Objects.requireNonNull(queue, "The input queue is null");
     }
     
-    public abstract void onPush(final ProducerThread<E> thread, 
+    public abstract void onPush(final AbstractSimulationThread<E> thread, 
                                 final E element);
     
     public abstract void onPop(final ConsumerThread<E> thread, 

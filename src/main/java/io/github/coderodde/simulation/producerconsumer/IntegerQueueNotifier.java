@@ -1,5 +1,7 @@
 package io.github.coderodde.simulation.producerconsumer;
 
+import java.util.Objects;
+
 /**
  *
  * @author rodio
@@ -15,25 +17,26 @@ public final class IntegerQueueNotifier extends AbstractQueueNotifier<Integer> {
                                 final int haltingElement) {
         super(queue);
         
-        this.pushFormat = "Producer %" 
-                        + producerCount 
+        this.pushFormat = "%s %" 
+                        + Integer.toString(producerCount).length()
                         + "d produced %" 
                         + Integer.toString(haltingElement).length() 
                         + "d: %s\n";
         
-        this.popFormat = "Consumer %" 
-                        + consumerCount 
+        this.popFormat = "%s %" 
+                        + Integer.toString(consumerCount).length()
                         + "d consumed %" 
                         + Integer.toString(haltingElement).length() 
                         + "d: %s\n";
     }
     
     @Override
-    public void onPush(final ProducerThread<Integer> thread,
+    public void onPush(final AbstractSimulationThread<Integer> thread,
                        final Integer element) {
         
         System.out.printf(pushFormat,   
-                          thread == null ? -1 : thread.getThreadId(), 
+                          thread.toString(),
+                          thread.getThreadId(), 
                           element, 
                           queue);
     }
@@ -42,9 +45,10 @@ public final class IntegerQueueNotifier extends AbstractQueueNotifier<Integer> {
     public void onPop(final ConsumerThread<Integer> thread,
                       final Integer element) {
         
-        System.out.printf(popFormat,  
-                          thread == null ? -1 : thread.getThreadId(),
-                          element, 
+        System.out.printf(popFormat, 
+                          thread.toString(),
+                          thread.getThreadId(),
+                          element,
                           queue);
     }
 }
