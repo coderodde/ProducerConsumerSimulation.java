@@ -1,5 +1,7 @@
 package io.github.coderodde.simulation.producerconsumer;
 
+import io.github.coderodde.simulation.producerconsumer.impl.IntegerQueueNotifier;
+import io.github.coderodde.simulation.producerconsumer.impl.IntegerElementProvider;
 import java.util.ArrayList;
 import java.util.List;
 

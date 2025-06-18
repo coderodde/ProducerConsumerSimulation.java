@@ -1,5 +1,9 @@
-package io.github.coderodde.simulation.producerconsumer;
+package io.github.coderodde.simulation.producerconsumer.impl;
 
+import io.github.coderodde.simulation.producerconsumer.AbstractQueueNotifier;
+import io.github.coderodde.simulation.producerconsumer.AbstractSimulationThread;
+import io.github.coderodde.simulation.producerconsumer.BoundedConcurrentQueue;
+import io.github.coderodde.simulation.producerconsumer.ConsumerThread;
 import java.util.Objects;
 
 /**

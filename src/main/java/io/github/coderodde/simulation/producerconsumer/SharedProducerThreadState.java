@@ -11,10 +11,10 @@ public final class SharedProducerThreadState {
     private final AtomicBoolean haltRequestedFlag = new AtomicBoolean(false);
     
     public boolean isHaltRequested() {
-        return haltRequestedFlag.getAcquire();
+        return haltRequestedFlag.get();
     }
     
     public void requestHalt() {
-        haltRequestedFlag.setRelease(true);
+        haltRequestedFlag.set(true);
     }
 }

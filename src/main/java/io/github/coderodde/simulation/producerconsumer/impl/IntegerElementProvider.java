@@ -1,5 +1,6 @@
-package io.github.coderodde.simulation.producerconsumer;
+package io.github.coderodde.simulation.producerconsumer.impl;
 
+import io.github.coderodde.simulation.producerconsumer.ElementProvider;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 

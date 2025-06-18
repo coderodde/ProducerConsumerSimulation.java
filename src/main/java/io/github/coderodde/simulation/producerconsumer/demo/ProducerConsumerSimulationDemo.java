@@ -1,4 +1,9 @@
-package io.github.coderodde.simulation.producerconsumer;
+package io.github.coderodde.simulation.producerconsumer.demo;
+
+import io.github.coderodde.simulation.producerconsumer.BoundedConcurrentQueue;
+import io.github.coderodde.simulation.producerconsumer.Simulator;
+import io.github.coderodde.simulation.producerconsumer.impl.IntegerQueueNotifier;
+import io.github.coderodde.simulation.producerconsumer.impl.IntegerElementProvider;
 
 /**
  * This class implements the producer/consumer simulation demonstration.

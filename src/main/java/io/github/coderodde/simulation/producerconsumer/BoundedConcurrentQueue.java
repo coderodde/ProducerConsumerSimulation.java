@@ -88,13 +88,6 @@ public final class BoundedConcurrentQueue<E> {
         return element;
     }
     
-    public E top() {
-        mutex.acquireUninterruptibly();
-        final E element = array[headIndex];
-        mutex.release();
-        return element;
-    }
-    
     public int size() {
         mutex.acquireUninterruptibly();
         final int sz = size;

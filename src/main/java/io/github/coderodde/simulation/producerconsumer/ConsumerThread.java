@@ -1,6 +1,8 @@
 package io.github.coderodde.simulation.producerconsumer;
 
-import java.util.Objects;
+import io.github.coderodde.simulation.producerconsumer.AbstractSimulationThread;
+import io.github.coderodde.simulation.producerconsumer.BoundedConcurrentQueue;
+import io.github.coderodde.simulation.producerconsumer.SharedProducerThreadState;
 
 /**
  *
@@ -28,12 +30,11 @@ public final class ConsumerThread<E> extends AbstractSimulationThread<E> {
             
             E element = queue.pop(this);
             
-//            if (Objects.equals(element, haltingElement)) {
-//                System.out.println("return");
-//                queue.pop(this);
-//                queue.push(haltingElement, this);
-//                return;
-//            }
+            if (element.equals(haltingElement)) {
+                queue.push(element, this);
+                System.out.println("bye");
+                return;
+            }
         }
     }
     
