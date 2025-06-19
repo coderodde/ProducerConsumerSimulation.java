@@ -9,7 +9,7 @@ import java.util.concurrent.Semaphore;
  * @version 1.0.0
  * @since 1.0.0
  */
-public final class BoundedConcurrentQueue<E> {
+public final class BoundedConcurrentQueue<E, R> {
     
     /**
      * The semaphore for protecting against pops on empty queue.
@@ -45,7 +45,7 @@ public final class BoundedConcurrentQueue<E> {
     /**
      * Possible queue notifier object.
      */
-    private AbstractQueueNotifier<E> queueNotifier;
+    private AbstractQueueNotifier<E, R> queueNotifier;
     
     public BoundedConcurrentQueue(final int capacity) {
         checkCapacity(capacity);
@@ -56,12 +56,12 @@ public final class BoundedConcurrentQueue<E> {
     }
     
     public void push(final E element,
-                     final AbstractSimulationThread<E> thread) {
+                     final AbstractSimulationThread<E, R> thread) {
         
         semaphoreFreeSpots.release();
         semaphoreFillSpots.acquireUninterruptibly();
         mutex.acquireUninterruptibly();
-        array[logicalIndexToPhysicalIndex(size++)] = element;
+        array[logicalIndexToPhysicalIndex(++size)] = element;
         
         if (queueNotifier != null) {
             queueNotifier.onPush(thread, 
@@ -71,7 +71,7 @@ public final class BoundedConcurrentQueue<E> {
         mutex.release();
     }
     
-    public E pop(final ConsumerThread<E> thread) {
+    public E pop(final ConsumerThread<E, R> thread) {
         semaphoreFillSpots.release();
         semaphoreFreeSpots.acquireUninterruptibly();
         mutex.acquireUninterruptibly();
@@ -86,6 +86,15 @@ public final class BoundedConcurrentQueue<E> {
         
         mutex.release();
         return element;
+    }
+    
+    public E top() {
+        semaphoreFreeSpots.acquireUninterruptibly();
+        mutex.acquireUninterruptibly();
+        final E topElement = array[headIndex];
+        mutex.release();
+        semaphoreFreeSpots.release();
+        return topElement;
     }
     
     public int size() {
@@ -113,7 +122,9 @@ public final class BoundedConcurrentQueue<E> {
         return sb.append("]").toString();
     }
     
-    public void setQueueNotifier(final AbstractQueueNotifier<E> queueNotifier) {
+    public void setQueueNotifier(
+            final AbstractQueueNotifier<E, R> queueNotifier) {
+        
         this.queueNotifier = queueNotifier;
     }
     

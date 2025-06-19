@@ -9,7 +9,7 @@ import java.util.Objects;
  * @version 1.0.0
  * @since 1.0.0
  */
-public abstract class AbstractSimulationThread<E> extends Thread {
+public abstract class AbstractSimulationThread<E, R> extends Thread {
     
     /**
      * The element that is there for signalling that a consumer thread must 
@@ -20,7 +20,7 @@ public abstract class AbstractSimulationThread<E> extends Thread {
     /**
      * The queue this thread works on.
      */
-    protected final BoundedConcurrentQueue<E> queue;
+    protected final BoundedConcurrentQueue<E, R> queue;
     
     /**
      * The ID of this abstract thread.
@@ -36,7 +36,7 @@ public abstract class AbstractSimulationThread<E> extends Thread {
     
     public AbstractSimulationThread(
             final E haltingElement,
-            final BoundedConcurrentQueue<E> queue,
+            final BoundedConcurrentQueue<E, R> queue,
             final SharedProducerThreadState sharedState) {
         
         this.threadId = threadIdCounter++;

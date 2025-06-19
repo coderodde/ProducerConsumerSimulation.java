@@ -8,12 +8,12 @@ import java.util.Objects;
  * @version 1.0.0
  * @since 1.0.0
  */
-public final class ProducerThread<E> extends AbstractSimulationThread<E> {
+public final class ProducerThread<E, R> extends AbstractSimulationThread<E, R> {
     
     private final ElementProvider<E> elementProvider;
     
     public ProducerThread(final ElementProvider<E> elementProducer,
-                          final BoundedConcurrentQueue<E> queue,
+                          final BoundedConcurrentQueue<E, R> queue,
                           final SharedProducerThreadState sharedState) {
         
         super(elementProducer.getHaltingElement(),
@@ -34,12 +34,16 @@ public final class ProducerThread<E> extends AbstractSimulationThread<E> {
             final E element        = elementProvider.produce();
             final E haltingElement = elementProvider.getHaltingElement();
             
-            queue.push(element, this);
-            
             if (Objects.equals(element, haltingElement)) {
                 sharedState.requestHalt();
+                System.out.println("element = " + element);
+                queue.push(haltingElement, this);
                 return;
+            } else {
+                System.out.println("fail");
             }
+            
+            queue.push(element, this);
         }
     }
     

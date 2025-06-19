@@ -4,22 +4,27 @@ import io.github.coderodde.simulation.producerconsumer.AbstractQueueNotifier;
 import io.github.coderodde.simulation.producerconsumer.AbstractSimulationThread;
 import io.github.coderodde.simulation.producerconsumer.BoundedConcurrentQueue;
 import io.github.coderodde.simulation.producerconsumer.ConsumerThread;
-import java.util.Objects;
+import java.math.BigInteger;
 
 /**
  *
  * @author rodio
  */
-public final class IntegerQueueNotifier extends AbstractQueueNotifier<Integer> {
+public final class LongQueueNotifier 
+        extends AbstractQueueNotifier<Long, BigInteger> {
     
     private final String pushFormat;
     private final String popFormat;
+    private FibonacciConsumerAction action;
     
-    public IntegerQueueNotifier(final BoundedConcurrentQueue<Integer> queue,
-                                final int consumerCount,
-                                final int producerCount,
-                                final int haltingElement) {
-        super(queue);
+    public LongQueueNotifier(
+            final BoundedConcurrentQueue<Long, BigInteger> queue,
+            final FibonacciConsumerAction action,
+            final int consumerCount,
+            final int producerCount,
+            final int haltingElement) {
+        
+        super(queue, action);
         
         this.pushFormat = "%s %" 
                         + Integer.toString(producerCount).length()
@@ -31,12 +36,13 @@ public final class IntegerQueueNotifier extends AbstractQueueNotifier<Integer> {
                         + Integer.toString(consumerCount).length()
                         + "d consumed %" 
                         + Integer.toString(haltingElement).length() 
-                        + "d: %s\n";
+                        + "d: %s: Result = %s\n";
     }
     
     @Override
-    public void onPush(final AbstractSimulationThread<Integer> thread,
-                       final Integer element) {
+    public void onPush(
+            final AbstractSimulationThread<Long, BigInteger> thread,
+            final Long element) {
         
         System.out.printf(pushFormat,   
                           thread.toString(),
@@ -46,13 +52,14 @@ public final class IntegerQueueNotifier extends AbstractQueueNotifier<Integer> {
     }
     
     @Override
-    public void onPop(final ConsumerThread<Integer> thread,
-                      final Integer element) {
+    public void onPop(final ConsumerThread<Long, BigInteger> thread,
+                      final Long element) {
         
         System.out.printf(popFormat, 
                           thread.toString(),
                           thread.getThreadId(),
                           element,
-                          queue);
+                          queue,
+                          action == null ? "null" : action.apply(element));
     }
 }

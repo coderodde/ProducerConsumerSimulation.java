@@ -6,17 +6,21 @@ import java.util.Objects;
  *
  * @author rodio
  */
-public abstract class AbstractQueueNotifier<E> {
+public abstract class AbstractQueueNotifier<E, R> {
     
-    protected final BoundedConcurrentQueue<E> queue;
+    protected final BoundedConcurrentQueue<E, R> queue;
+    protected final ConsumerAction<E, R> action;
     
-    public AbstractQueueNotifier(final BoundedConcurrentQueue<E> queue) {
-        this.queue = Objects.requireNonNull(queue, "The input queue is null");
+    public AbstractQueueNotifier(final BoundedConcurrentQueue<E, R> queue,
+                                 final ConsumerAction<E, R> action) {
+        
+        this.queue  = Objects.requireNonNull(queue,  "Input queue is null");
+        this.action = Objects.requireNonNull(action, "Input action is null");
     }
     
-    public abstract void onPush(final AbstractSimulationThread<E> thread, 
+    public abstract void onPush(final AbstractSimulationThread<E, R> thread, 
                                 final E element);
     
-    public abstract void onPop(final ConsumerThread<E> thread, 
+    public abstract void onPop(final ConsumerThread<E, R> thread, 
                                 final E element);
 }

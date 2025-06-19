@@ -1,7 +1,9 @@
 package io.github.coderodde.simulation.producerconsumer;
 
-import io.github.coderodde.simulation.producerconsumer.impl.IntegerQueueNotifier;
+import io.github.coderodde.simulation.producerconsumer.impl.FibonacciConsumerAction;
+import io.github.coderodde.simulation.producerconsumer.impl.LongQueueNotifier;
 import io.github.coderodde.simulation.producerconsumer.impl.IntegerElementProvider;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +14,10 @@ public final class Simulator {
     
     private final int numberOfProducerThreads;
     private final int numberOfConsumerThreads;
-    private BoundedConcurrentQueue<Integer> queue;
+    private BoundedConcurrentQueue<Long, BigInteger> queue;
     private IntegerElementProvider elementProducer;
-    private IntegerQueueNotifier queueNotifier;
+    private LongQueueNotifier queueNotifier;
+    private FibonacciConsumerAction action;
     
     public Simulator(final int numberOfProducerThreads,
                      final int numberOfConsumerThreads) {
@@ -26,7 +29,9 @@ public final class Simulator {
                 checkNumberOfConsumerThreads(numberOfConsumerThreads);
     }
     
-    public void setQueue(final BoundedConcurrentQueue<Integer> queue) {
+    public void setQueue(
+            final BoundedConcurrentQueue<Long, BigInteger> queue) {
+        
         this.queue = queue;
     }
     
@@ -36,16 +41,20 @@ public final class Simulator {
         this.elementProducer = elementProducer;
     }
     
-    public void setQueueNotifier(final IntegerQueueNotifier queueNotifier) {
+    public void setQueueNotifier(final LongQueueNotifier queueNotifier) {
         this.queueNotifier = queueNotifier;
+    }
+    
+    public void setAction(final FibonacciConsumerAction action) {
+        this.action = action;
     }
     
     public void run() {
         
         queue.setQueueNotifier(queueNotifier);
         
-        final List<ConsumerThread<Integer>> consumerThreadList;
-        final List<ProducerThread<Integer>> producerThreadList;
+        final List<ConsumerThread<Long, BigInteger>> consumerThreadList;
+        final List<ProducerThread<Long, BigInteger>> producerThreadList;
         
         final SharedProducerThreadState sharedState =
           new SharedProducerThreadState();
@@ -54,17 +63,18 @@ public final class Simulator {
         producerThreadList = new ArrayList<>(numberOfProducerThreads);
         
         for (int i = 0; i < numberOfConsumerThreads; ++i) {
-            final ConsumerThread<Integer> thread = 
-                    new ConsumerThread(elementProducer.getHaltingElement(), 
-                                       queue,
-                                       sharedState);
+            final ConsumerThread<Long, BigInteger> thread = 
+                    new ConsumerThread<Long, BigInteger>(elementProducer.getHaltingElement(), 
+                                         queue,
+                                         sharedState,
+                                         action);
             
             consumerThreadList.add(thread);
             thread.start();
         }
         
         for (int i = 0; i < numberOfProducerThreads; ++i) {
-            final ProducerThread<Integer> thread = 
+            final ProducerThread<Long, BigInteger> thread = 
                     new ProducerThread(elementProducer, 
                                        queue,
                                        sharedState);
@@ -73,7 +83,9 @@ public final class Simulator {
             thread.start();
         }
         
-        for (final ConsumerThread<Integer> thread : consumerThreadList) {
+        for (final ConsumerThread<Long, BigInteger> thread
+                : consumerThreadList) {
+            
             try {
                 thread.join();
             } catch (final InterruptedException ex) {
@@ -82,7 +94,9 @@ public final class Simulator {
             }
         }
         
-        for (final ProducerThread<Integer> thread : producerThreadList) {
+        for (final ProducerThread<Long, BigInteger> thread
+                : producerThreadList) {
+            
             try {
                 thread.join();
             } catch (final InterruptedException ex) {

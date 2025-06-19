@@ -2,42 +2,46 @@ package io.github.coderodde.simulation.producerconsumer.impl;
 
 import io.github.coderodde.simulation.producerconsumer.ElementProvider;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Random;
 
 /**
  * @version 1.0.0
  * @since 1.0.0
  */
-public final class IntegerElementProvider implements ElementProvider<Integer> {
+public final class IntegerElementProvider implements ElementProvider<Long> {
 
+    private final long bound;
+    
     /**
      * The halting element signalling the end of element production.
      */
-    private final Integer haltingInteger;
+    private final long totalNumberOfOperations;
     
-    /**
-     * The integer element counter.
-     */
-    private final AtomicInteger atomicInteger = new AtomicInteger(0);
+    private long numberOfOperationsPerformed = 0;
     
-    public IntegerElementProvider(final Integer haltingElement) {
-        this.haltingInteger = 
-                Objects.requireNonNull(
-                        haltingElement,
-                        "The input haltingInteger is null");
+    private final long haltingElement;
+    
+    private final Random random = new Random();
+    
+    public IntegerElementProvider(final long bound,
+                                  final long totalNumberOfOperations,
+                                  final long haltingElement) {
+        this.bound = bound;
+        this.totalNumberOfOperations = totalNumberOfOperations;
+        this.haltingElement = haltingElement;
     }
     
     @Override
-    public Integer getHaltingElement() {
-        return haltingInteger;
+    public Long getHaltingElement() {
+        return haltingElement;
     }
     
     @Override
-    public Integer produce() {
-        if (atomicInteger.get() >= haltingInteger) {
-            return haltingInteger;
+    public synchronized Long produce() {
+        if (numberOfOperationsPerformed++ < totalNumberOfOperations) {
+            return random.nextLong(bound);
+        } else {
+            return haltingElement;
         }
-        
-        return atomicInteger.getAndIncrement();
     }
 }
