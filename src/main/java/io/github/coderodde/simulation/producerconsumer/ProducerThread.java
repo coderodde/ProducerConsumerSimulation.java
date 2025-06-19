@@ -14,11 +14,13 @@ public final class ProducerThread<E, R> extends AbstractSimulationThread<E, R> {
     
     public ProducerThread(final ElementProvider<E> elementProducer,
                           final BoundedConcurrentQueue<E, R> queue,
-                          final SharedProducerThreadState sharedState) {
+                          final SharedProducerThreadState sharedState,
+                          final ConsumerAction<E, R> action) {
         
         super(elementProducer.getHaltingElement(),
               queue, 
-              sharedState);
+              sharedState,
+              action);
         
         this.elementProvider = elementProducer;
     }

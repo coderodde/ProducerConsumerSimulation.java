@@ -32,12 +32,15 @@ public abstract class AbstractSimulationThread<E, R> extends Thread {
      */
     private static int threadIdCounter = 0;
     
+    protected final ConsumerAction<E, R> action;
+    
     protected final SharedProducerThreadState sharedState;
     
     public AbstractSimulationThread(
             final E haltingElement,
             final BoundedConcurrentQueue<E, R> queue,
-            final SharedProducerThreadState sharedState) {
+            final SharedProducerThreadState sharedState,
+            final ConsumerAction<E, R> action) {
         
         this.threadId = threadIdCounter++;
         
@@ -51,6 +54,8 @@ public abstract class AbstractSimulationThread<E, R> extends Thread {
                 Objects.requireNonNull(
                         sharedState, 
                         "The input sharedState is null");
+        
+        this.action = Objects.requireNonNull(action, "action is null");
     }
     
     public int getThreadId() {

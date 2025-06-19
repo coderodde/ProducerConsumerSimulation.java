@@ -77,7 +77,8 @@ public final class Simulator {
             final ProducerThread<Long, BigInteger> thread = 
                     new ProducerThread(elementProducer, 
                                        queue,
-                                       sharedState);
+                                       sharedState,
+                                       action);
             
             producerThreadList.add(thread);
             thread.start();

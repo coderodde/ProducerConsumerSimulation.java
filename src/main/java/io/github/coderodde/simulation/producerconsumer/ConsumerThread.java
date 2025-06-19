@@ -18,7 +18,8 @@ public final class ConsumerThread<E, R> extends AbstractSimulationThread<E, R> {
         
         super(haltingElement,
               queue, 
-              sharedState);
+              sharedState,
+              action);
         
         this.action = Objects.requireNonNull(action, "Input action is null");
     }
@@ -32,8 +33,9 @@ public final class ConsumerThread<E, R> extends AbstractSimulationThread<E, R> {
             if (element.equals(haltingElement)) {
                 System.out.println("return " + this.getThreadId());
                 return;
+            } else {
+                System.out.println("hello");
             }
-            
             
             queue.pop(this);
         }

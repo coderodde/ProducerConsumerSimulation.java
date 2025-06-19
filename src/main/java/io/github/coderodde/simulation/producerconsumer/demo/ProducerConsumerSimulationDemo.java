@@ -35,11 +35,10 @@ public final class ProducerConsumerSimulationDemo {
         
         final LongQueueNotifier queueNotifier = 
                 new LongQueueNotifier(queue,
-                                         action,
+                                      action,
                                          DEFAULT_NUMBER_OF_CONSUMERS, 
                                          DEFAULT_NUMBER_OF_PRODUCERS,
                                          DEFAULT_HALTING_INTEGER);
-        
         
         final Simulator simulator = new Simulator(DEFAULT_NUMBER_OF_PRODUCERS,
                                                   DEFAULT_NUMBER_OF_CONSUMERS);
