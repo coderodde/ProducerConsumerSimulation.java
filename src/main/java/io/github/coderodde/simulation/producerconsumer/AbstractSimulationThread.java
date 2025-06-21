@@ -6,6 +6,7 @@ import java.util.Objects;
  * This class implements an abstract base class for producer/consumer threads.
  * 
  * @param <E> the queue element type.
+ * @param <R> the queue result element type.
  * @version 1.0.0
  * @since 1.0.0
  */
@@ -32,10 +33,24 @@ public abstract class AbstractSimulationThread<E, R> extends Thread {
      */
     private static int threadIdCounter = 0;
     
+    /**
+     * The queue action.
+     */
     protected final ConsumerAction<E, R> action;
     
+    /**
+     * The shared producer thread state used for requesting the exit.
+     */
     protected final SharedProducerThreadState sharedState;
     
+    /**
+     * Constructs this thread.
+     * 
+     * @param haltingElement the halting element.   
+     * @param queue          the target queue.
+     * @param sharedState    the shared state.
+     * @param action         the action.
+     */
     public AbstractSimulationThread(
             final E haltingElement,
             final BoundedConcurrentQueue<E, R> queue,
@@ -56,8 +71,14 @@ public abstract class AbstractSimulationThread<E, R> extends Thread {
                         "The input sharedState is null");
         
         this.action = Objects.requireNonNull(action, "action is null");
+        
     }
     
+    /**
+     * Returns the ID of this thread.
+     * 
+     * @return the ID of this thread.
+     */
     public int getThreadId() {
         return threadId;
     }

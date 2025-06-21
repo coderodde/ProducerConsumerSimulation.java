@@ -4,7 +4,7 @@ import io.github.coderodde.simulation.producerconsumer.BoundedConcurrentQueue;
 import io.github.coderodde.simulation.producerconsumer.Simulator;
 import io.github.coderodde.simulation.producerconsumer.impl.FibonacciConsumerAction;
 import io.github.coderodde.simulation.producerconsumer.impl.LongQueueNotifier;
-import io.github.coderodde.simulation.producerconsumer.impl.IntegerElementProvider;
+import io.github.coderodde.simulation.producerconsumer.impl.LongElementProvider;
 import java.math.BigInteger;
 
 /**
@@ -23,8 +23,8 @@ public final class ProducerConsumerSimulationDemo {
     private static final long TOTAL_OPERATIONS = 300;
     
     public static void main(String[] args) {
-        final IntegerElementProvider elementProvider = 
-                    new IntegerElementProvider(LONG_BOUND,
+        final LongElementProvider elementProvider = 
+                    new LongElementProvider(LONG_BOUND,
                                                TOTAL_OPERATIONS, 
                                                Long.MIN_VALUE);
         

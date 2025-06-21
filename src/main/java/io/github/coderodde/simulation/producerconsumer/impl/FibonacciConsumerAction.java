@@ -7,7 +7,8 @@ import java.math.BigInteger;
  *
  * @author rodio
  */
-public final class FibonacciConsumerAction implements ConsumerAction<Long, BigInteger> {
+public final class FibonacciConsumerAction 
+        implements ConsumerAction<Long, BigInteger> {
 
     @Override
     public BigInteger apply(final Long arg) {

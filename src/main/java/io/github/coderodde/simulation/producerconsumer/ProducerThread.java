@@ -30,6 +30,7 @@ public final class ProducerThread<E, R> extends AbstractSimulationThread<E, R> {
         while (true) {
             
             if (sharedState.isHaltRequested()) {
+                System.out.printf("[STATUS] Producer %d exited.\n", threadId);
                 return;
             }
             
@@ -41,8 +42,6 @@ public final class ProducerThread<E, R> extends AbstractSimulationThread<E, R> {
                 System.out.println("element = " + element);
                 queue.push(haltingElement, this);
                 return;
-            } else {
-                System.out.println("fail");
             }
             
             queue.push(element, this);

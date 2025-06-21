@@ -2,7 +2,7 @@ package io.github.coderodde.simulation.producerconsumer;
 
 import io.github.coderodde.simulation.producerconsumer.impl.FibonacciConsumerAction;
 import io.github.coderodde.simulation.producerconsumer.impl.LongQueueNotifier;
-import io.github.coderodde.simulation.producerconsumer.impl.IntegerElementProvider;
+import io.github.coderodde.simulation.producerconsumer.impl.LongElementProvider;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ public final class Simulator {
     private final int numberOfProducerThreads;
     private final int numberOfConsumerThreads;
     private BoundedConcurrentQueue<Long, BigInteger> queue;
-    private IntegerElementProvider elementProducer;
+    private LongElementProvider elementProducer;
     private LongQueueNotifier queueNotifier;
     private FibonacciConsumerAction action;
     
@@ -36,7 +36,7 @@ public final class Simulator {
     }
     
     public void setElementProvider(
-            final IntegerElementProvider elementProducer) {
+            final LongElementProvider elementProducer) {
         
         this.elementProducer = elementProducer;
     }

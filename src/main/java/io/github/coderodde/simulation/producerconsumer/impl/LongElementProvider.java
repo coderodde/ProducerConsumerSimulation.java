@@ -1,14 +1,13 @@
 package io.github.coderodde.simulation.producerconsumer.impl;
 
 import io.github.coderodde.simulation.producerconsumer.ElementProvider;
-import java.util.Objects;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @version 1.0.0
  * @since 1.0.0
  */
-public final class IntegerElementProvider implements ElementProvider<Long> {
+public final class LongElementProvider implements ElementProvider<Long> {
 
     private final long bound;
     
@@ -21,11 +20,9 @@ public final class IntegerElementProvider implements ElementProvider<Long> {
     
     private final long haltingElement;
     
-    private final Random random = new Random();
-    
-    public IntegerElementProvider(final long bound,
-                                  final long totalNumberOfOperations,
-                                  final long haltingElement) {
+    public LongElementProvider(final long bound,
+                               final long totalNumberOfOperations,
+                               final long haltingElement) {
         this.bound = bound;
         this.totalNumberOfOperations = totalNumberOfOperations;
         this.haltingElement = haltingElement;
@@ -37,9 +34,9 @@ public final class IntegerElementProvider implements ElementProvider<Long> {
     }
     
     @Override
-    public synchronized Long produce() {
+    public Long produce() {
         if (numberOfOperationsPerformed++ < totalNumberOfOperations) {
-            return random.nextLong(bound);
+            return ThreadLocalRandom.current().nextLong(bound);
         } else {
             return haltingElement;
         }

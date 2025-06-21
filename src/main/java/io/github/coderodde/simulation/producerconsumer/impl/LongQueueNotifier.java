@@ -15,7 +15,6 @@ public final class LongQueueNotifier
     
     private final String pushFormat;
     private final String popFormat;
-    private FibonacciConsumerAction action;
     
     public LongQueueNotifier(
             final BoundedConcurrentQueue<Long, BigInteger> queue,

@@ -47,6 +47,11 @@ public final class BoundedConcurrentQueue<E, R> {
      */
     private AbstractQueueNotifier<E, R> queueNotifier;
     
+    /**
+     * The action performed on each popped element.
+     */
+    private ConsumerAction<E, R> action;
+    
     public BoundedConcurrentQueue(final int capacity) {
         checkCapacity(capacity);
         semaphoreFreeSpots = new Semaphore(0,        true);
@@ -55,22 +60,35 @@ public final class BoundedConcurrentQueue<E, R> {
         array              = (E[]) new Object[capacity];
     }
     
+    /**
+     * Pushes the {@code element} to the end of this queue.
+     * 
+     * @param element the element to push.
+     * @param thread  the thread pushing.
+     */
     public void push(final E element,
                      final AbstractSimulationThread<E, R> thread) {
         
         semaphoreFreeSpots.release();
         semaphoreFillSpots.acquireUninterruptibly();
         mutex.acquireUninterruptibly();
-        array[logicalIndexToPhysicalIndex(++size)] = element;
         
         if (queueNotifier != null) {
             queueNotifier.onPush(thread, 
                                  element);
         }
         
+        array[logicalIndexToPhysicalIndex(size++)] = element;
         mutex.release();
     }
     
+    /**
+     * Pops the head element from this queue.
+     * 
+     * @param thread the thread popping.
+     * 
+     * @return the popped element.
+     */
     public E pop(final ConsumerThread<E, R> thread) {
         semaphoreFillSpots.release();
         semaphoreFreeSpots.acquireUninterruptibly();
@@ -88,6 +106,11 @@ public final class BoundedConcurrentQueue<E, R> {
         return element;
     }
     
+    /**
+     * Peeks at the head element of this queue.
+     * 
+     * @return the head element.
+     */
     public E top() {
         semaphoreFreeSpots.acquireUninterruptibly();
         mutex.acquireUninterruptibly();
@@ -97,6 +120,11 @@ public final class BoundedConcurrentQueue<E, R> {
         return topElement;
     }
     
+    /**
+     * Return the length of the queue.
+     * 
+     * @return the length of the queue.
+     */
     public int size() {
         mutex.acquireUninterruptibly();
         final int sz = size;
@@ -104,6 +132,11 @@ public final class BoundedConcurrentQueue<E, R> {
         return sz;
     }
     
+    /**
+     * Return the textual representation of this queue.
+     * 
+     * @return the textual representation.
+     */
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[");
@@ -122,12 +155,33 @@ public final class BoundedConcurrentQueue<E, R> {
         return sb.append("]").toString();
     }
     
+    /**
+     * Sets the queue notifier.
+     * 
+     * @param queueNotifier the queue notifier to set.
+     */
     public void setQueueNotifier(
             final AbstractQueueNotifier<E, R> queueNotifier) {
         
         this.queueNotifier = queueNotifier;
     }
     
+    /**
+     * Sets the action.
+     * 
+     * @param action the consumer action.
+     */
+    public void setAction(final ConsumerAction<E, R> action) {
+        this.action = action;
+    }
+    
+    /**
+     * Converts logical index of an element to physical.
+     * 
+     * @param index the logical index of an element.
+     * 
+     * @return the physical index of an element. 
+     */
     private int logicalIndexToPhysicalIndex(final int index) {
         return (headIndex + index) % array.length;
     }
