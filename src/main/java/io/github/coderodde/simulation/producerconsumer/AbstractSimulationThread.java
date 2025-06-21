@@ -65,11 +65,7 @@ public abstract class AbstractSimulationThread<E, R> extends Thread {
                         "The input haltingElement is null");
         
         this.queue = Objects.requireNonNull(queue, "The input queue is null");
-        this.sharedState = 
-                Objects.requireNonNull(
-                        sharedState, 
-                        "The input sharedState is null");
-        
+        this.sharedState = sharedState;
         this.action = Objects.requireNonNull(action, "action is null");
         
     }

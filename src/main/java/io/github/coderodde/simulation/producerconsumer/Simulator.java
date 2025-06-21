@@ -8,17 +8,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * This class implements a simulator that orchestrates the threads.
  */
 public final class Simulator {
     
+    /**
+     * The number of producer threads.
+     */
     private final int numberOfProducerThreads;
+    
+    /**
+     * The number of consumer threads.
+     */
     private final int numberOfConsumerThreads;
+    
+    /**
+     * The target queue.
+     */
     private BoundedConcurrentQueue<Long, BigInteger> queue;
-    private LongElementProvider elementProducer;
+    
+    /**
+     * The element provider.
+     */
+    private LongElementProvider elementProvider;
+    
+    /**
+     * The queue notifier.
+     */
     private LongQueueNotifier queueNotifier;
+    
+    /**
+     * The action performed on each element popped from {@link #queue}.
+     */
     private FibonacciConsumerAction action;
     
+    /**
+     * Constructs this simulator.
+     * 
+     * @param numberOfProducerThreads the number of producers.
+     * @param numberOfConsumerThreads the number of consumers.
+     */
     public Simulator(final int numberOfProducerThreads,
                      final int numberOfConsumerThreads) {
         
@@ -29,26 +58,49 @@ public final class Simulator {
                 checkNumberOfConsumerThreads(numberOfConsumerThreads);
     }
     
+    /**
+     * Sets the queue.
+     * 
+     * @param queue the target queue to set.
+     */
     public void setQueue(
             final BoundedConcurrentQueue<Long, BigInteger> queue) {
         
         this.queue = queue;
     }
     
+    /**
+     * Sets the element provider.
+     * 
+     * @param elementProducer the element provider to set.
+     */
     public void setElementProvider(
             final LongElementProvider elementProducer) {
         
-        this.elementProducer = elementProducer;
+        this.elementProvider = elementProducer;
     }
     
+    /**
+     * Sets the queue notifier.
+     * 
+     * @param queueNotifier the queue notifier to set.
+     */
     public void setQueueNotifier(final LongQueueNotifier queueNotifier) {
         this.queueNotifier = queueNotifier;
     }
     
+    /**
+     * Sets the consumer action.
+     * 
+     * @param action the action to set. 
+     */
     public void setAction(final FibonacciConsumerAction action) {
         this.action = action;
     }
     
+    /**
+     * Runs the actual simulation.
+     */
     public void run() {
         
         queue.setQueueNotifier(queueNotifier);
@@ -64,9 +116,8 @@ public final class Simulator {
         
         for (int i = 0; i < numberOfConsumerThreads; ++i) {
             final ConsumerThread<Long, BigInteger> thread = 
-                    new ConsumerThread<Long, BigInteger>(elementProducer.getHaltingElement(), 
+                    new ConsumerThread<>(elementProvider.getHaltingElement(), 
                                          queue,
-                                         sharedState,
                                          action);
             
             consumerThreadList.add(thread);
@@ -75,10 +126,10 @@ public final class Simulator {
         
         for (int i = 0; i < numberOfProducerThreads; ++i) {
             final ProducerThread<Long, BigInteger> thread = 
-                    new ProducerThread(elementProducer, 
-                                       queue,
-                                       sharedState,
-                                       action);
+                    new ProducerThread<>(elementProvider, 
+                                         queue,
+                                         sharedState,
+                                         action);
             
             producerThreadList.add(thread);
             thread.start();
@@ -107,6 +158,13 @@ public final class Simulator {
         }
     }
     
+    /**
+     * Checks that there is at least one producer thread requested.
+     * 
+     * @param numberOfProducerThreads the number of producer threads to create.
+     * 
+     * @return the same as input.
+     */
     private static int 
         checkNumberOfProducerThreads(final int numberOfProducerThreads) {
      
@@ -122,6 +180,13 @@ public final class Simulator {
         return numberOfProducerThreads;
     }
     
+    /**
+     * Checks that there is at least one consumer thread requested.
+     * 
+     * @param numberOfConsumerThreads the number of consumer threads to create.
+     * 
+     * @return the same as input.
+     */
     private static int 
         checkNumberOfConsumerThreads(final int numberOfConsumerThreads) {
      
@@ -135,19 +200,5 @@ public final class Simulator {
         }
         
         return numberOfConsumerThreads;
-    }
-    
-    private static int checkQueueCapacity(final int queueCapacity) {
-     
-        if (queueCapacity < 1) {
-            final String exceptionMessage = 
-                    String.format(
-                            "queueCapacity(%d) < 1", 
-                            queueCapacity);
-            
-            throw new IllegalArgumentException(exceptionMessage);
-        }
-        
-        return queueCapacity;
     }
 }

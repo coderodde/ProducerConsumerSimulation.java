@@ -73,12 +73,13 @@ public final class BoundedConcurrentQueue<E, R> {
         semaphoreFillSpots.acquireUninterruptibly();
         mutex.acquireUninterruptibly();
         
+        array[logicalIndexToPhysicalIndex(size++)] = element;
+        
         if (queueNotifier != null) {
             queueNotifier.onPush(thread, 
                                  element);
         }
         
-        array[logicalIndexToPhysicalIndex(size++)] = element;
         mutex.release();
     }
     
@@ -186,6 +187,9 @@ public final class BoundedConcurrentQueue<E, R> {
         return (headIndex + index) % array.length;
     }
     
+    /**
+     * Checks that the input capacity is sensible (at least 1).
+     */
     private static void checkCapacity(final int capacity) {
         if (capacity < 1) {
             final String exceptionMessage = 

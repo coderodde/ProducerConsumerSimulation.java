@@ -5,26 +5,42 @@ import java.util.Objects;
 /**
  * This class implements producer threads.
  * 
+ * @param <E> the element type.
+ * @param <R> the result type.
  * @version 1.0.0
  * @since 1.0.0
  */
 public final class ProducerThread<E, R> extends AbstractSimulationThread<E, R> {
     
+    /**
+     * The element provider.
+     */
     private final ElementProvider<E> elementProvider;
     
-    public ProducerThread(final ElementProvider<E> elementProducer,
+    /**
+     * Constructs this producer thread.
+     * 
+     * @param elementProvider the element provider.
+     * @param queue           the target queue.
+     * @param sharedState     the shared state.
+     * @param action          the action.
+     */
+    public ProducerThread(final ElementProvider<E> elementProvider,
                           final BoundedConcurrentQueue<E, R> queue,
                           final SharedProducerThreadState sharedState,
                           final ConsumerAction<E, R> action) {
         
-        super(elementProducer.getHaltingElement(),
+        super(elementProvider.getHaltingElement(),
               queue, 
               sharedState,
               action);
         
-        this.elementProvider = elementProducer;
+        this.elementProvider = elementProvider;
     }
     
+    /**
+     * Runs the simulation.
+     */
     @Override
     public void run() {
         while (true) {
@@ -34,12 +50,10 @@ public final class ProducerThread<E, R> extends AbstractSimulationThread<E, R> {
                 return;
             }
             
-            final E element        = elementProvider.produce();
-            final E haltingElement = elementProvider.getHaltingElement();
+            final E element = elementProvider.provide();
             
             if (Objects.equals(element, haltingElement)) {
                 sharedState.requestHalt();
-                System.out.println("element = " + element);
                 queue.push(haltingElement, this);
                 return;
             }
@@ -48,6 +62,11 @@ public final class ProducerThread<E, R> extends AbstractSimulationThread<E, R> {
         }
     }
     
+    /**
+     * Returns the name of this thread.
+     * 
+     * @return the name of this thread.
+     */
     @Override
     public String toString() {
         return "Producer thread";
