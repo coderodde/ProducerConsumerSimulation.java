@@ -29,11 +29,6 @@ public abstract class AbstractSimulationThread<E, R> extends Thread {
     protected final int threadId;
     
     /**
-     * Counts the total number of threads. Used for {@code threadId}.
-     */
-    private static int threadIdCounter = 0;
-    
-    /**
      * The queue action.
      */
     protected final ConsumerAction<E, R> action;
@@ -46,18 +41,20 @@ public abstract class AbstractSimulationThread<E, R> extends Thread {
     /**
      * Constructs this thread.
      * 
+     * @param id             the ID of this thread.
      * @param haltingElement the halting element.   
      * @param queue          the target queue.
      * @param sharedState    the shared state.
      * @param action         the action.
      */
     public AbstractSimulationThread(
+            final int id,
             final E haltingElement,
             final BoundedConcurrentQueue<E, R> queue,
             final SharedProducerThreadState sharedState,
             final ConsumerAction<E, R> action) {
         
-        this.threadId = threadIdCounter++;
+        this.threadId = id;
         
         this.haltingElement =
                 Objects.requireNonNull(

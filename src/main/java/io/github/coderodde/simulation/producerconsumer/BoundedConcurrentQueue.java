@@ -6,6 +6,7 @@ import java.util.concurrent.Semaphore;
  * This class implements a bounded concurrent queue.
  * 
  * @param <E> the queue element type.
+ * @param <R> the result element type.
  * @version 1.0.0
  * @since 1.0.0
  */
@@ -45,13 +46,13 @@ public final class BoundedConcurrentQueue<E, R> {
     /**
      * Possible queue notifier object.
      */
-    private AbstractQueueNotifier<E, R> queueNotifier;
+    private AbstractQueueListener<E, R> queueListener;
     
     /**
-     * The action performed on each popped element.
+     * Constructs this bounded concurrent queue.
+     * 
+     * @param capacity the maximum size of the queue.
      */
-    private ConsumerAction<E, R> action;
-    
     public BoundedConcurrentQueue(final int capacity) {
         checkCapacity(capacity);
         semaphoreFreeSpots = new Semaphore(0,        true);
@@ -75,8 +76,8 @@ public final class BoundedConcurrentQueue<E, R> {
         
         array[logicalIndexToPhysicalIndex(size++)] = element;
         
-        if (queueNotifier != null) {
-            queueNotifier.onPush(thread, 
+        if (queueListener != null) {
+            queueListener.onPush(thread, 
                                  element);
         }
         
@@ -98,8 +99,8 @@ public final class BoundedConcurrentQueue<E, R> {
         headIndex = (headIndex + 1) % array.length;
         --size;
         
-        if (queueNotifier != null) {
-            queueNotifier.onPop(thread,
+        if (queueListener != null) {
+            queueListener.onPop(thread,
                                 element);
         }
         
@@ -159,21 +160,12 @@ public final class BoundedConcurrentQueue<E, R> {
     /**
      * Sets the queue notifier.
      * 
-     * @param queueNotifier the queue notifier to set.
+     * @param queueListener the queue listener to set.
      */
     public void setQueueNotifier(
-            final AbstractQueueNotifier<E, R> queueNotifier) {
+            final AbstractQueueListener<E, R> queueListener) {
         
-        this.queueNotifier = queueNotifier;
-    }
-    
-    /**
-     * Sets the action.
-     * 
-     * @param action the consumer action.
-     */
-    public void setAction(final ConsumerAction<E, R> action) {
-        this.action = action;
+        this.queueListener = queueListener;
     }
     
     /**

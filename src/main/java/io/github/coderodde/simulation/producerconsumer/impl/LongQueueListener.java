@@ -1,19 +1,19 @@
 package io.github.coderodde.simulation.producerconsumer.impl;
 
-import io.github.coderodde.simulation.producerconsumer.AbstractQueueNotifier;
+import io.github.coderodde.simulation.producerconsumer.AbstractQueueListener;
 import io.github.coderodde.simulation.producerconsumer.AbstractSimulationThread;
 import io.github.coderodde.simulation.producerconsumer.BoundedConcurrentQueue;
 import io.github.coderodde.simulation.producerconsumer.ConsumerThread;
 import java.math.BigInteger;
 
 /**
- * This class implements a queue notifier.
+ * This class implements a queue listener.
  * 
  * @version 1.0.0
  * @since 1.0.0
  */
-public final class LongQueueNotifier 
-        extends AbstractQueueNotifier<Long, BigInteger> {
+public final class LongQueueListener 
+        extends AbstractQueueListener<Long, BigInteger> {
     
     /**
      * Push message format.
@@ -34,25 +34,25 @@ public final class LongQueueNotifier
      * @param producerCount  the number of producers.
      * @param haltingElement the halting element.
      */
-    public LongQueueNotifier(
+    public LongQueueListener(
             final BoundedConcurrentQueue<Long, BigInteger> queue,
             final FibonacciConsumerAction action,
             final int consumerCount,
             final int producerCount,
-            final int haltingElement) {
+            final long haltingElement) {
         
         super(queue, action);
         
         this.pushFormat = "%s %" 
                         + Integer.toString(producerCount).length()
                         + "d produced %" 
-                        + Integer.toString(haltingElement).length() 
+                        + Long.toString(haltingElement).length() 
                         + "d: %s\n";
         
         this.popFormat = "%s %" 
                         + Integer.toString(consumerCount).length()
                         + "d consumed %" 
-                        + Integer.toString(haltingElement).length() 
+                        + Long.toString(haltingElement).length() 
                         + "d: %s: Result = %s\n";
     }
     

@@ -13,15 +13,18 @@ public final class ConsumerThread<E, R> extends AbstractSimulationThread<E, R> {
     /**
      * Constructs this consumer thread.
      * 
+     * @param id             the ID of this consumer thread.
      * @param haltingElement the element indicating this thread should exit.
      * @param queue          the target queue.
      * @param action         the pop action.
      */
-    public ConsumerThread(final E haltingElement,
+    public ConsumerThread(final int id,
+                          final E haltingElement,
                           final BoundedConcurrentQueue<E, R> queue,
                           final ConsumerAction<E, R> action) {
         
-        super(haltingElement,
+        super(id,
+              haltingElement,
               queue, 
               null,
               action);
@@ -48,7 +51,7 @@ public final class ConsumerThread<E, R> extends AbstractSimulationThread<E, R> {
     /**
      * Returns the name of this thread.
      * 
-     * @return the name of thsi thread. 
+     * @return the name of this thread. 
      */
     @Override
     public String toString() {

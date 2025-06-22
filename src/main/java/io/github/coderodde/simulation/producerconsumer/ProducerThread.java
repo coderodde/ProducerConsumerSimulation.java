@@ -20,17 +20,20 @@ public final class ProducerThread<E, R> extends AbstractSimulationThread<E, R> {
     /**
      * Constructs this producer thread.
      * 
+     * @param id              the ID of this producer thread.
      * @param elementProvider the element provider.
      * @param queue           the target queue.
      * @param sharedState     the shared state.
      * @param action          the action.
      */
-    public ProducerThread(final ElementProvider<E> elementProvider,
+    public ProducerThread(final int id,
+                          final ElementProvider<E> elementProvider,
                           final BoundedConcurrentQueue<E, R> queue,
                           final SharedProducerThreadState sharedState,
                           final ConsumerAction<E, R> action) {
         
-        super(elementProvider.getHaltingElement(),
+        super(id,
+              elementProvider.getHaltingElement(),
               queue, 
               sharedState,
               action);

@@ -1,16 +1,17 @@
 package io.github.coderodde.simulation.producerconsumer;
 
-import io.github.coderodde.simulation.producerconsumer.impl.FibonacciConsumerAction;
-import io.github.coderodde.simulation.producerconsumer.impl.LongQueueNotifier;
-import io.github.coderodde.simulation.producerconsumer.impl.LongElementProvider;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This class implements a simulator that orchestrates the threads.
+ * 
+ * @param <E> the queue element type.
+ * @param <R> the result element type.
+ * @version 1.0.0
+ * @since 1.0.0
  */
-public final class Simulator {
+public final class Simulator<E, R> {
     
     /**
      * The number of producer threads.
@@ -25,22 +26,22 @@ public final class Simulator {
     /**
      * The target queue.
      */
-    private BoundedConcurrentQueue<Long, BigInteger> queue;
+    private BoundedConcurrentQueue<E, R> queue;
     
     /**
      * The element provider.
      */
-    private LongElementProvider elementProvider;
+    private ElementProvider<E> elementProvider;
     
     /**
      * The queue notifier.
      */
-    private LongQueueNotifier queueNotifier;
+    private AbstractQueueListener<E, R> queueListener;
     
     /**
      * The action performed on each element popped from {@link #queue}.
      */
-    private FibonacciConsumerAction action;
+    private ConsumerAction<E, R> action;
     
     /**
      * Constructs this simulator.
@@ -63,9 +64,7 @@ public final class Simulator {
      * 
      * @param queue the target queue to set.
      */
-    public void setQueue(
-            final BoundedConcurrentQueue<Long, BigInteger> queue) {
-        
+    public void setQueue(final BoundedConcurrentQueue<E, R> queue) {
         this.queue = queue;
     }
     
@@ -74,19 +73,19 @@ public final class Simulator {
      * 
      * @param elementProducer the element provider to set.
      */
-    public void setElementProvider(
-            final LongElementProvider elementProducer) {
-        
+    public void setElementProvider(final ElementProvider<E> elementProducer) {
         this.elementProvider = elementProducer;
     }
     
     /**
      * Sets the queue notifier.
      * 
-     * @param queueNotifier the queue notifier to set.
+     * @param queueListener the queue notifier to set.
      */
-    public void setQueueNotifier(final LongQueueNotifier queueNotifier) {
-        this.queueNotifier = queueNotifier;
+    public void setQueueListener(
+            final AbstractQueueListener<E, R> queueListener) {
+        
+        this.queueListener = queueListener;
     }
     
     /**
@@ -94,7 +93,7 @@ public final class Simulator {
      * 
      * @param action the action to set. 
      */
-    public void setAction(final FibonacciConsumerAction action) {
+    public void setAction(final ConsumerAction<E, R> action) {
         this.action = action;
     }
     
@@ -103,10 +102,10 @@ public final class Simulator {
      */
     public void run() {
         
-        queue.setQueueNotifier(queueNotifier);
+        queue.setQueueNotifier(queueListener);
         
-        final List<ConsumerThread<Long, BigInteger>> consumerThreadList;
-        final List<ProducerThread<Long, BigInteger>> producerThreadList;
+        final List<ConsumerThread<E, R>> consumerThreadList;
+        final List<ProducerThread<E, R>> producerThreadList;
         
         final SharedProducerThreadState sharedState =
           new SharedProducerThreadState();
@@ -115,8 +114,9 @@ public final class Simulator {
         producerThreadList = new ArrayList<>(numberOfProducerThreads);
         
         for (int i = 0; i < numberOfConsumerThreads; ++i) {
-            final ConsumerThread<Long, BigInteger> thread = 
-                    new ConsumerThread<>(elementProvider.getHaltingElement(), 
+            final ConsumerThread<E, R> thread = 
+                    new ConsumerThread<>(i,
+                                         elementProvider.getHaltingElement(), 
                                          queue,
                                          action);
             
@@ -125,8 +125,9 @@ public final class Simulator {
         }
         
         for (int i = 0; i < numberOfProducerThreads; ++i) {
-            final ProducerThread<Long, BigInteger> thread = 
-                    new ProducerThread<>(elementProvider, 
+            final ProducerThread<E, R> thread = 
+                    new ProducerThread<>(i,
+                                         elementProvider, 
                                          queue,
                                          sharedState,
                                          action);
@@ -135,7 +136,7 @@ public final class Simulator {
             thread.start();
         }
         
-        for (final ConsumerThread<Long, BigInteger> thread
+        for (final ConsumerThread<E, R> thread
                 : consumerThreadList) {
             
             try {
@@ -146,7 +147,7 @@ public final class Simulator {
             }
         }
         
-        for (final ProducerThread<Long, BigInteger> thread
+        for (final ProducerThread<E, R> thread
                 : producerThreadList) {
             
             try {
@@ -156,6 +157,8 @@ public final class Simulator {
                 System.exit(1);
             }
         }
+        
+        System.out.println("[STATUS] Simulation done!");
     }
     
     /**

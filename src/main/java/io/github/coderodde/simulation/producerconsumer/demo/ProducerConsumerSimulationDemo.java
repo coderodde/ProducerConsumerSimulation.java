@@ -3,7 +3,7 @@ package io.github.coderodde.simulation.producerconsumer.demo;
 import io.github.coderodde.simulation.producerconsumer.BoundedConcurrentQueue;
 import io.github.coderodde.simulation.producerconsumer.Simulator;
 import io.github.coderodde.simulation.producerconsumer.impl.FibonacciConsumerAction;
-import io.github.coderodde.simulation.producerconsumer.impl.LongQueueNotifier;
+import io.github.coderodde.simulation.producerconsumer.impl.LongQueueListener;
 import io.github.coderodde.simulation.producerconsumer.impl.LongElementProvider;
 import java.math.BigInteger;
 
@@ -15,40 +15,39 @@ import java.math.BigInteger;
  */
 public final class ProducerConsumerSimulationDemo {
 
-    private static final int DEFAULT_NUMBER_OF_PRODUCERS = 20;
-    private static final int DEFAULT_NUMBER_OF_CONSUMERS = 15;
-    private static final int DEFAULT_HALTING_INTEGER = 300;
-    private static final int DEFAULT_QUEUE_CAPACITY = 10;
+    private static final int DEFAULT_NUMBER_OF_PRODUCERS = 3;
+    private static final int DEFAULT_NUMBER_OF_CONSUMERS = 5;
+    private static final int DEFAULT_QUEUE_CAPACITY = 6;
+    private static final long DEFAULT_HALTING_ELEMENT = -1;
     private static final long LONG_BOUND = 31;
-    private static final long TOTAL_OPERATIONS = 300;
+    private static final long TOTAL_OPERATIONS = 20;
     
     public static void main(String[] args) {
         final LongElementProvider elementProvider = 
                     new LongElementProvider(LONG_BOUND,
-                                               TOTAL_OPERATIONS, 
-                                               Long.MIN_VALUE);
+                                            TOTAL_OPERATIONS, 
+                                            DEFAULT_HALTING_ELEMENT);
         
         final FibonacciConsumerAction action = new FibonacciConsumerAction();
         
         final BoundedConcurrentQueue<Long, BigInteger> queue = 
                 new BoundedConcurrentQueue<>(DEFAULT_QUEUE_CAPACITY);
         
-        final LongQueueNotifier queueNotifier = 
-                new LongQueueNotifier(queue,
+        final LongQueueListener queueNotifier = 
+                new LongQueueListener(queue,
                                       action,
-                                         DEFAULT_NUMBER_OF_CONSUMERS, 
-                                         DEFAULT_NUMBER_OF_PRODUCERS,
-                                         DEFAULT_HALTING_INTEGER);
+                                      DEFAULT_NUMBER_OF_CONSUMERS, 
+                                      DEFAULT_NUMBER_OF_PRODUCERS,
+                                      DEFAULT_HALTING_ELEMENT);
         
-        final Simulator simulator = new Simulator(DEFAULT_NUMBER_OF_PRODUCERS,
-                                                  DEFAULT_NUMBER_OF_CONSUMERS);
+        final Simulator<Long, BigInteger> simulator = 
+                new Simulator<>(DEFAULT_NUMBER_OF_PRODUCERS,
+                                DEFAULT_NUMBER_OF_CONSUMERS);
         
         simulator.setQueue(queue);
         simulator.setElementProvider(elementProvider);
-        simulator.setQueueNotifier(queueNotifier);
+        simulator.setQueueListener(queueNotifier);
         simulator.setAction(action);
         simulator.run();
-        
-        System.out.println("[STATUS] Simulation done!");
     }
 }

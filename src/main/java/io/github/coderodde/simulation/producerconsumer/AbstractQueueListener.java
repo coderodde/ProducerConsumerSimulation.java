@@ -3,14 +3,14 @@ package io.github.coderodde.simulation.producerconsumer;
 import java.util.Objects;
 
 /**
- * This abstract class defines the API for queue notifiers.
+ * This abstract class defines the API for queue listeners.
  * 
  * @param <E> the queue element type.
  * @param <R> the result element type.
  * @version 1.0.0
  * @since 1.0.0
  */
-public abstract class AbstractQueueNotifier<E, R> {
+public abstract class AbstractQueueListener<E, R> {
     
     /**
      * The target queue.
@@ -23,7 +23,13 @@ public abstract class AbstractQueueNotifier<E, R> {
      */
     protected final ConsumerAction<E, R> action;
     
-    public AbstractQueueNotifier(final BoundedConcurrentQueue<E, R> queue,
+    /**
+     * Constructs this abstract queue listener.
+     * 
+     * @param queue  the target queue to listen for.
+     * @param action the action to perform on the queue elements.
+     */
+    public AbstractQueueListener(final BoundedConcurrentQueue<E, R> queue,
                                  final ConsumerAction<E, R> action) {
         
         this.queue  = Objects.requireNonNull(queue,  "Input queue is null");
